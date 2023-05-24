@@ -64,6 +64,16 @@ function routeNameContains($string) {
         </div>
      </div>
 
+     <div class="card {{ routeNameContains('technologies.') ? 'border-primary' : '' }}">
+      <div class="card-header {{ routeNameContains('technologies.') ? 'text-primary' : '' }}">
+        Tecnologie
+      </div>
+      <div class="list-group list-group-flush">
+        <a href="{{route('admin.technologies.index')}}" class="list-group-item list-group-item-action {{routeNameContains('technologies.index') ? 'active' : ''}}">Tutte le tecnologie</a>
+        <a href="{{route('admin.technologies.create')}}" class="list-group-item list-group-item-action {{routeNameContains('technologies.create') ? 'active' : ''}}">Aggiungi una tecnologia</a>
+      </div>
+   </div>
+
     </aside>
     <main>
         @yield('content')

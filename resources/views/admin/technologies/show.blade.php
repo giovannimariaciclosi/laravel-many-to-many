@@ -3,9 +3,9 @@
 @section('content')
 
 <div class="container">
-  <h1>Tutti i porgetti {{$type->name}}</h1>
+  <h1>Tutti i porgetti con tecnologia {{$technology->name}}</h1>
 
-  @if( count($type->projects) > 0)
+  @if( count($technology->projects) > 0)
   <table class="mt-5 table table-striped">
     <thead>
       <th>Titolo</th>
@@ -15,7 +15,7 @@
     </thead>
 
     <tbody>
-      @foreach ($type->projects as $project)
+      @foreach ($technology->projects as $project)
         <tr>
           <td>{{$project->title}}</td>
           <td>{{$project->description}}</td>
@@ -27,14 +27,14 @@
   </table>
 
   @else
-    <em>Nessun progetto di questo tipo.</em>
+    <em>Nessun progetto con questa tecnologia.</em>
   @endif  
 
 </div>
 
 <div class="container mt-5 mb-5 d-flex justify-content-around">
-  <a href="{{route('admin.types.index')}}"><button class="btn btn-primary">Torna indietro</button></a>
-  <a href="{{route('admin.types.edit', $type)}}" class="btn btn-success">Modifica il tipo</a>
+  <a href="{{route('admin.technologies.index')}}"><button class="btn btn-primary">Torna indietro</button></a>
+  <a href="{{route('admin.technologies.edit', $technology)}}" class="btn btn-success">Modifica la tecnologia</a>
 
   <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
     Elimina
@@ -49,16 +49,16 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          Sei sicuro di voler eliminare il tipo:
+          Sei sicuro di voler eliminare la tecnologia:
           <br>
-          "{{$type->name}}"?
+          "{{$technology->name}}"?
           <br><br>
           Questa è un'azione irreversibile. Non potrai tornare indietro in nessun modo.
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
           
-          <form action="{{route('admin.types.destroy', $type)}}" method="POST">
+          <form action="{{route('admin.technologies.destroy', $technology)}}" method="POST">
             @csrf
             @method('DELETE')
             <button type="submit" class="btn btn-danger">Elimina</button>
