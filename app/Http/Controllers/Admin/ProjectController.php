@@ -131,7 +131,7 @@ class ProjectController extends Controller
         // importo il validator con il percorso Illuminate\Support\Facades\Validator;
         $validator = Validator::make($formData, [
             // controllo che i parametri del form rispettino le seguenti regole
-            'title' => 'required|max:200|min:5',
+            'title' => 'required|max:200|min:5|unique:App\Models\Project,title',
             'description' => 'required',
             'slug' => 'nullable',
             'github_repository' => 'required|max:255',
@@ -141,6 +141,7 @@ class ProjectController extends Controller
         ], [
             // messaggi da comunicare all'utente per ogni errore
             'title.required' => 'Devi inserire un Titolo.',
+            'title.unique' => 'È già presente un Titolo con questo nome.',
             'title.max' => 'Il campo Titolo deve essere minore di :max caratteri.',
             'title.min' => 'Il campo Titolo deve essere maggiore di :min caratteri',
             'description.required' => 'Devi inserire una Descrizione.',

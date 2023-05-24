@@ -120,7 +120,7 @@ class TypeController extends Controller
         ], [
             'name.max' => 'Il campo Nome deve essere minore di :max caratteri.',
             'name.required' => 'Devi inserire un Nome.',
-            'name.unique' => 'È già presente una categoria con questo Nome.',
+            'name.unique' => 'È già presente un Tipo con questo Nome.',
             'description.required' => 'Devi inserire una Descrizione.'
         ])->validate();
         return $validator;
