@@ -12,6 +12,7 @@
       <th>Slug</th>
       <th>Github Repository</th>
       <th>Tipo</th>
+      <th>Tecnologia</th>
       <th></th>
     </thead>
   
@@ -25,7 +26,24 @@
 
         {{-- stampo il tipo solo dove esiste --}}
         <td>{{$project->type?->name}}</td>
-        
+
+        <td>
+          {{-- con i badge colorati --}}
+          {{-- @foreach($project->technologies as $technology)
+          <span class="badge rounded-pill mx-1" style="background-color: {{$technology->color}}">{{$technology->name}}</span>
+          @endforeach --}}
+
+          {{-- senza badge colorati --}}
+          @php
+          $tagNames = [];
+          
+          foreach ($project->technologies as $technology) {
+            $tagNames[] = $technology->name;
+          }
+
+          echo implode(', ', $tagNames);
+          @endphp
+        </td>        
         <td><a href="{{route('admin.projects.show', $project)}}"><i class="fa-solid fa-magnifying-glass"></i></a></td>
       </tr>
       @endforeach

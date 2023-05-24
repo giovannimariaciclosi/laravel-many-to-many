@@ -8,6 +8,12 @@
 
     {{-- se è presente stampo il nome del type --}}
     <span>Tipo: {{$project->type->name ?? 'Nessun Tipo'}}</span>
+
+    <div class="d-flex py-3">
+      @foreach($project->technologies as $technology)
+        <span class="badge rounded-pill mx-1" style="background-color: {{$technology->color}}">{{$technology->name}}</span>
+      @endforeach
+    </div>
     
     <hr>
     <span>Descrizione:</span>

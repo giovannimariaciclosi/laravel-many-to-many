@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Project;
+use App\Models\Technology;
 use App\Models\Type;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -31,8 +32,10 @@ class ProjectController extends Controller
     {
         // creo un array di tipi e lo passo con il compact
         $types = Type::all();
+        // creo un array di tecnologie e lo passo con il compact
+        $technologies = Technology::all();
 
-        return view('admin.projects.create', compact('types'));
+        return view('admin.projects.create', compact('types', 'technologies'));
     }
 
     /**
@@ -47,7 +50,6 @@ class ProjectController extends Controller
 
         $this->validation($request);
 
-
         $formData = $request->all();
 
         $formData['slug'] = Str::slug($formData['title'], '-');
@@ -56,9 +58,18 @@ class ProjectController extends Controller
 
         $newProject->fill($formData);
 
+        // il save va fatto prima dell'inserimento delle tecnologie (relazione molti a molti)
+        // perchè solo quando effettuiamo il salvataggio della riga nel database viene generato l'id
         $newProject->save();
+        // inserisco le tecnologie relative al progetto nella tabella ponte
+        if (array_key_exists('technologies', $formData)) {
+            // il metodo attach della risorsa many-to-many "technologies" che ho collegato a Project
+            // mi permette di inserire in automatico nella tabella ponte i collegamenti, riga per riga, con le tecnologie
+            // passatigli tramite un array
+            $newProject->technologies()->attach($formData['technologies']);
+        }
 
-        return redirect()->route('admin.projects.show', $newProject->slug);
+        return redirect()->route('admin.projects.show', $newProject);
     }
 
     /**
@@ -82,8 +93,10 @@ class ProjectController extends Controller
     {
         // creo un array di tipi e lo passo con il compact
         $types = Type::all();
+        // creo un array di tecnologie e lo passo con il compact
+        $technologies = Technology::all();
 
-        return view('admin.projects.edit', compact('project', 'types'));
+        return view('admin.projects.edit', compact('project', 'types', 'technologies'));
     }
 
     /**
@@ -104,9 +117,16 @@ class ProjectController extends Controller
 
         $project->update($formData);
 
-        $project->save();
+        // dobbiamo sempre controllare che l'array esista
+        if (array_key_exists('technologies', $formData)) {
+            // la funzione sync() ci permette di sincronizzare i tag selezionati nel form con quelli presenti nella tabella ponte
+            $project->technologies()->sync($formData['technologies']);
+        } else {
+            // dobbiamo specificare che se non è stato selezionato alcuna tecnologia, deve eliminare tutti i suoi riferimenti dalla tabella ponte
+            $project->technologies()->detach();
+        }
 
-        return redirect()->route('admin.projects.show', $project->slug);
+        return redirect()->route('admin.projects.show', $project);
     }
 
     /**
@@ -131,7 +151,7 @@ class ProjectController extends Controller
         // importo il validator con il percorso Illuminate\Support\Facades\Validator;
         $validator = Validator::make($formData, [
             // controllo che i parametri del form rispettino le seguenti regole
-            'title' => 'required|max:200|min:5|unique:App\Models\Project,title',
+            'title' => 'required|max:200|min:5',
             'description' => 'required',
             'slug' => 'nullable',
             'github_repository' => 'required|max:255',
@@ -141,7 +161,6 @@ class ProjectController extends Controller
         ], [
             // messaggi da comunicare all'utente per ogni errore
             'title.required' => 'Devi inserire un Titolo.',
-            'title.unique' => 'È già presente un Titolo con questo nome.',
             'title.max' => 'Il campo Titolo deve essere minore di :max caratteri.',
             'title.min' => 'Il campo Titolo deve essere maggiore di :min caratteri',
             'description.required' => 'Devi inserire una Descrizione.',
