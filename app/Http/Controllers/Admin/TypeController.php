@@ -89,7 +89,8 @@ class TypeController extends Controller
     {
         $formData = $request->all();
 
-        $this->validation($formData);
+        // passo anche l'id che serve nel validator
+        $this->validation($formData, $type->id);
 
         $formData['slug'] = Str::slug($formData['name'], '-');
 
@@ -112,15 +113,22 @@ class TypeController extends Controller
     }
 
     // validazione
-    private function validation($formData)
+    private function validation($formData, $id = null)
     {
+        // se cerco di modificare un type senza cambiargli il nome non avrò l'avviso che è già presente un tipo con questo nome
+        if ($id != null) {
+            $nameValidator = 'max:100|required|unique:App\Models\Type,name,' . $id;
+        } else {
+            $nameValidator = 'max:100|required|unique:App\Models\Type,name';
+        }
+
         $validator = Validator::make($formData, [
-            'name' => 'max:100|required|unique:App\Models\Type,name',
+            'name' => $nameValidator,
             'description' => 'required',
         ], [
             'name.max' => 'Il campo Nome deve essere minore di :max caratteri.',
             'name.required' => 'Devi inserire un Nome.',
-            'name.unique' => 'È già presente un Tipo con questo Nome.',
+            'name.unique' => 'È già presente un Tipo con questo nome.',
             'description.required' => 'Devi inserire una Descrizione.'
         ])->validate();
         return $validator;

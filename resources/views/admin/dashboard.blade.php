@@ -8,7 +8,7 @@
   <table class="mt-5 table table-striped">
     <thead>
       <th>Vai a</th>
-      <th>Aggiungi un</th>
+      <th>Aggiungi un/a</th>
     </thead>
 
     <tbody>
@@ -20,6 +20,11 @@
         <tr>
           <td><a href="{{route('admin.types.index')}}" type="button" class="btn btn-primary">Tutti i tipi</a></td>
           <td><a href="{{route('admin.types.create')}}" class="btn btn-success" type="button">Tipo</a>
+          </td>
+        </tr>
+        <tr>
+          <td><a href="{{route('admin.technologies.index')}}" type="button" class="btn btn-primary">Tutte le tecnologie</a></td>
+          <td><a href="{{route('admin.technologies.create')}}" class="btn btn-success" type="button">Tecnologia</a>
           </td>
         </tr>
     </tbody>

@@ -89,13 +89,14 @@ class TechnologyController extends Controller
     {
         $formData = $request->all();
 
-        $this->validation($formData);
+        // passo anche l'id che serve nel validator
+        $this->validation($formData, $technology->id);
 
         $formData['slug'] = Str::slug($formData['name'], '-');
 
         $technology->update($formData);
 
-        return redirect()->route('admin/technologies/show', $technology);
+        return redirect()->route('admin.technologies.show', $technology);
     }
 
     /**
@@ -112,15 +113,23 @@ class TechnologyController extends Controller
     }
 
     // validazione
-    private function validation($formData)
+    private function validation($formData, $id = null)
     {
+
+        // se cerco di modificare una tecnologia senza cambiargli il nome non avrò l'avviso che è già presente una tecnologia con questo nome
+        if ($id != null) {
+            $nameValidator = 'max:100|required|unique:technologies,name,' . $id;
+        } else {
+            $nameValidator = 'max:100|required|unique:technologies,name';
+        }
+
         $validator = Validator::make($formData, [
-            'name' => 'max:100|required|unique:App\Models\Technology,name',
+            'name' => $nameValidator,
             'color' => 'max:7',
         ], [
             'name.max' => 'Il campo Nome deve essere minore di :max caratteri.',
             'name.required' => 'Devi inserire un Nome.',
-            'name.unique' => 'È già presente un Tipo con questo Nome.',
+            'name.unique' => 'È già presente una Tecnologia con questo nome.',
             'color.max' => 'Il campo Colore deve essere minore di :max caratteri.'
         ])->validate();
         return $validator;

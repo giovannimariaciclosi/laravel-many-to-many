@@ -109,7 +109,7 @@ class ProjectController extends Controller
     public function update(Request $request, Project $project)
     {
         // chiamo la funzione di validazione
-        $this->validation($request);
+        $this->validation($request, $project->id);
 
         $formData = $request->all();
 
@@ -143,15 +143,22 @@ class ProjectController extends Controller
     }
 
     // funzione per validare
-    private function validation($request)
+    private function validation($request, $id = null)
     {
         // con il metodo all prendo i parametri del form
         $formData = $request->all();
 
+        // se cerco di modificare un progetto senza cambiargli il titolo non avrò l'avviso che è già presente un titolo con questo nome
+        if ($id != null) {
+            $nameValidator = 'required|max:200|min:5|unique:projects,title,' . $id;
+        } else {
+            $nameValidator = 'required|max:200|min:5|unique:projects,title';
+        }
+
         // importo il validator con il percorso Illuminate\Support\Facades\Validator;
         $validator = Validator::make($formData, [
             // controllo che i parametri del form rispettino le seguenti regole
-            'title' => 'required|max:200|min:5',
+            'title' => $nameValidator,
             'description' => 'required',
             'slug' => 'nullable',
             'github_repository' => 'required|max:255',
@@ -163,6 +170,7 @@ class ProjectController extends Controller
             'title.required' => 'Devi inserire un Titolo.',
             'title.max' => 'Il campo Titolo deve essere minore di :max caratteri.',
             'title.min' => 'Il campo Titolo deve essere maggiore di :min caratteri',
+            'title.unique' => 'È già presente un Titolo con questo nome.',
             'description.required' => 'Devi inserire una Descrizione.',
             // 'slug.required' => "Il campo Slug non può essere vuoto e deve essere uguale al campo Titolo.",
             // 'slug.max' => 'Il campo Slug deve essere minore di 200 caratteri ed uguale al campo Titolo.',
