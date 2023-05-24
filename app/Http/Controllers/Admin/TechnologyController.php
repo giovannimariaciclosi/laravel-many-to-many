@@ -5,6 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Technology;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+// helper per gestire le stringhe
+use Illuminate\Support\Str;
 
 class TechnologyController extends Controller
 {
@@ -27,7 +30,7 @@ class TechnologyController extends Controller
      */
     public function create()
     {
-        //
+        return view('admin.technologies.create');
     }
 
     /**
@@ -38,7 +41,19 @@ class TechnologyController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $formData = $request->all();
+
+        $this->validation($formData);
+
+        $formData['slug'] = Str::slug($formData['name'], '-');
+
+        $newTechnology = new Technology();
+
+        $newTechnology->fill($formData);
+
+        $newTechnology->save();
+
+        return redirect()->route('admin.technologies.show', $newTechnology);
     }
 
     /**
@@ -60,7 +75,7 @@ class TechnologyController extends Controller
      */
     public function edit(Technology $technology)
     {
-        //
+        return view('admin/technologies/edit', compact('technology'));
     }
 
     /**
@@ -72,7 +87,15 @@ class TechnologyController extends Controller
      */
     public function update(Request $request, Technology $technology)
     {
-        //
+        $formData = $request->all();
+
+        $this->validation($formData);
+
+        $formData['slug'] = Str::slug($formData['name'], '-');
+
+        $technology->update($formData);
+
+        return redirect()->route('admin/technologies/show', $technology);
     }
 
     /**
@@ -83,6 +106,23 @@ class TechnologyController extends Controller
      */
     public function destroy(Technology $technology)
     {
-        //
+        $technology->delete();
+
+        return redirect()->route('admin.technologies.index');
+    }
+
+    // validazione
+    private function validation($formData)
+    {
+        $validator = Validator::make($formData, [
+            'name' => 'max:100|required|unique:App\Models\Technology,name',
+            'color' => 'max:7',
+        ], [
+            'name.max' => 'Il campo Nome deve essere minore di :max caratteri.',
+            'name.required' => 'Devi inserire un Nome.',
+            'name.unique' => 'È già presente un Tipo con questo Nome.',
+            'color.max' => 'Il campo Colore deve essere minore di :max caratteri.'
+        ])->validate();
+        return $validator;
     }
 }
