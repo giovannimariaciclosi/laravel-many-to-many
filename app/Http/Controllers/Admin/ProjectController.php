@@ -7,6 +7,7 @@ use App\Models\Project;
 use App\Models\Technology;
 use App\Models\Type;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
@@ -55,6 +56,16 @@ class ProjectController extends Controller
         $formData['slug'] = Str::slug($formData['title'], '-');
 
         $newProject = new Project();
+
+        // prima di salvare controlliamo che sia stato inviato il file
+        if ($request->hasFile('cover_image')) {
+            // salviamo il file nella cartella project_images dentro storage/app/public
+            // che è linkata anche in public/storage
+            $path = Storage::put('project_images', $request->cover_image);
+
+            // nel db come cover_image non salviamo il file ma soltanto il suo path
+            $formData['cover_image'] = $path;
+        }
 
         $newProject->fill($formData);
 
@@ -113,6 +124,18 @@ class ProjectController extends Controller
 
         $formData = $request->all();
 
+        // prima di aggiornare controlliamo che sia stato inviato il file
+        if ($request->hasFile('cover_image')) {
+            //cancelliamo la vecchia immagine
+            Storage::delete($project->cover_image);
+
+            //salviamo la nuova immagine
+            $path = Storage::put('project_images', $request->cover_image);
+
+            // nel db come cover_image non salviamo il file ma soltanto il suo path
+            $formData['cover_image'] = $path;
+        }
+
         $formData['slug'] = Str::slug($formData['title'], '-');
 
         $project->update($formData);
@@ -165,6 +188,7 @@ class ProjectController extends Controller
 
             // il campo type_id deve esistere nella tabella types con campo id
             'type_id' => 'nullable|exists:types,id',
+            'cover_image' => 'nullable|image|max:4096',
         ], [
             // messaggi da comunicare all'utente per ogni errore
             'title.required' => 'Devi inserire un Titolo.',
@@ -178,6 +202,8 @@ class ProjectController extends Controller
             'github_repository.required' => 'Devi inserire un Link Repository Github.',
             'github_repository.max' => 'Il campo Link Repository Github deve essere minore di :max caratteri.',
             'type_id.exists' => 'Il Tipo deve essere scelto esclusivamente tra le opzioni disponibili.',
+            'cover_image.max' => 'La dimensione del file è troppo grande, deve essere inferiore a :max kb.',
+            'cover_image.image' => 'Il file deve essere di tipo immagine.'
         ])->validate();
 
         // restituisco il validator che in caso di errore fa automaticamente il redirect

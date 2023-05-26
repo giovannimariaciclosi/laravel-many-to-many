@@ -4,6 +4,9 @@
 
 <div class="container">
   <div class="main">
+    <div class="text-center">
+      <img src="{{ asset('storage/' . $project->cover_image) }}" alt="{{$project->title}}" class="w-50">
+    </div>
     <h1>{{$project->title}}</h1>
 
     {{-- se è presente stampo il nome del type --}}

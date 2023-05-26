@@ -4,7 +4,7 @@
 
 <main>
   <div class="container mb-3 mt-3">
-    <form action="{{route('admin.projects.store')}}" method="POST">
+    <form action="{{route('admin.projects.store')}}" method="POST" enctype="multipart/form-data">
       @csrf
   
       <div class="mb-3">
@@ -35,6 +35,19 @@
           </div>
         @enderror
       </div>
+
+      {{-- inserimento file --}}
+      <div class="mb-3">
+        <label for="cover_image">Immagine di copertina</label>
+        <input type="file" id="cover_image" name="cover_image" class="form-control @error('cover_image') is-invalid @enderror">
+
+        @error('cover_image')
+        <div class="invalid-feedback">
+          {{$message}}
+        </div>
+      @enderror
+      </div>
+      {{-- /inserimento file --}}
 
       <div class="mb-3 form-group">
         <h4>Tecnologie</h4>
