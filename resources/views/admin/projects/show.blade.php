@@ -19,7 +19,7 @@
     <span>Descrizione:</span>
     <p>{{$project->description}}</p>
     <span>Link Repository Github:</span>
-    <p>{{$project->github_repository}}</p>
+    <p><a href="{{$project->github_repository}}" target="_blank">{{$project->github_repository}}</a></p>
     <span>Slug:</span>
     <p>{{$project->slug}}</p>
   </div>
