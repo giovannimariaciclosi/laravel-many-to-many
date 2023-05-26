@@ -126,8 +126,12 @@ class ProjectController extends Controller
 
         // prima di aggiornare controlliamo che sia stato inviato il file
         if ($request->hasFile('cover_image')) {
-            //cancelliamo la vecchia immagine
-            Storage::delete($project->cover_image);
+
+            // controlliamo nel db se esiste già un'immagine
+            if ($project->cover_image) {
+                // se esiste cancelliamo la vecchia immagine
+                Storage::delete($project->cover_image);
+            }
 
             //salviamo la nuova immagine
             $path = Storage::put('project_images', $request->cover_image);
@@ -160,6 +164,12 @@ class ProjectController extends Controller
      */
     public function destroy(Project $project)
     {
+        // se è presente una cover_image (immagine)
+        if ($project->cover_image) {
+            // la cancello
+            Storage::delete($project->cover_image);
+        }
+
         $project->delete();
 
         return redirect()->route('admin.projects.index');
